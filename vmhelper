@@ -42,7 +42,7 @@ get() {
         fi
 
         if [[ -n $VM ]]; then
-            echo -n "$(virsh snapshot-list --name "$VM" | fzf) "
+            echo -n "$(virsh snapshot-list --name "$VM" | fzf)"
         fi
         ;;
     *)
@@ -58,11 +58,10 @@ ssh-vm() {
     while [[ "$#" -gt 0 ]]; do
         case "$1" in
         -h | --help)
-            echo "Usage: vmhelper ssh-vm [?OPTION] [?USERNAME]"
-            echo "If no option is selected, default to active VM names"
+            echo "Usage: vmhelper ssh-vm [?OPTION] [USERNAME]"
             echo "Commands:"
             echo "  -h, --help              Display this message"
-            echo "  USERNAME                Username to connect with to VM, defaults to root if not provided"
+            echo "  USERNAME                Username to connect with to VM"
             exit 0
             ;;
         *)
@@ -73,8 +72,7 @@ ssh-vm() {
     done
 
     if [[ -z $USERNAME ]]; then
-
-        USERNAME='root'
+        echo "no username provided"
     fi
 
     IP=$(get --ip)
@@ -85,11 +83,24 @@ ssh-vm() {
 }
 
 ssh-copy() {
+    while [[ "$#" -gt 0 ]]; do
+        case "$1" in
+        -h | --help)
+            echo "Usage: vmhelper ssh-copy [?OPTION] [USERNAME]"
+            echo "Commands:"
+            echo "  -h, --help              Display this message"
+            echo "  USERNAME                Username to copy to on VM"
+            exit 0
+            ;;
+        esac
+    done
+
     local USERNAME
     USERNAME=$1
 
     if [[ -z $USERNAME ]]; then
-        USERNAME=root
+        echo "no username selected"
+        exit
     fi
     ssh-copy-id "$USERNAME@$(get --ip)"
 }
@@ -161,7 +172,7 @@ rollback-snapshot() {
 
     if [[ $CHOICE == 'y' ]]; then
         echo "running: virsh snapshot-revert $VM $SNAPSHOT"
-        virsh snapshot-revert $VM $SNAPSHOT
+        virsh snapshot-revert "$VM" "$SNAPSHOT"
     else
         echo 'revert cancelled'
     fi
