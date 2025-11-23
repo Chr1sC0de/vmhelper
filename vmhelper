@@ -85,7 +85,13 @@ ssh-vm() {
 }
 
 ssh-copy() {
-    ssh-copy-id "$1@$(get --ip)"
+    local USERNAME
+    USERNAME=$1
+
+    if [[ -z $USERNAME ]]; then
+        USERNAME=root
+    fi
+    ssh-copy-id "$USERNAME@$(get --ip)"
 }
 
 create-snapshot() {
@@ -171,7 +177,7 @@ while [[ "$#" -gt 0 ]]; do
         echo "  get [OPTIONS]                   Get vm information"
         echo "  start                           Start a VM"
         echo "  shutdown                        Shutdown a VM"
-        echo "  attach                          Attach to a VM"
+        echo "  attach                          Attach to a VM though the console"
         echo "  ssh [OPTIONS] [?USERNAME]       SSH into a vm"
         echo "  ssh-copy [?IP_ADDRESS]          Copy RSA key to vm"
         echo "  create-snapshot [OPTIONS]       Create a snapshot for a VM"

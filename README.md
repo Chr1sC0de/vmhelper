@@ -3,6 +3,21 @@
 ## Create a VM from the command line
 
 
+```bash
+virt-install \
+  --name ubuntu2504 \
+  --ram 8192 \
+  --vcpus 4 \
+  --disk path=/var/lib/libvirt/images/ubuntu2504.img,format=qcow2,size=40 \
+  --location ubuntu-25.04-live-server-amd64.iso,kernel=casper/vmlinuz,initrd=casper/initrd \
+  --os-variant ubuntu25.04 \
+  --network network=default \
+  --graphics none \
+  --console pty,target_type=serial \
+  --extra-args="console=ttyS0,115200n8"
+```
+
+
 ## List all VMs
 
 ```bash
