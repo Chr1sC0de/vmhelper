@@ -2,7 +2,17 @@
 
 get() {
     case "$1" in
-    -h | --help) ;;
+    -h | --help)
+        echo "Usage: vmhelper get [?OPTION]"
+        echo "If no option is selected, default to active VM names"
+        echo "Commands:"
+        echo "  -h, --help              Display this message"
+        echo "  --all                   Fuzzy get all VM names"
+        echo "  --inactive              Fuzzy get inactive VM name"
+        echo "  --active                Fuzzy get active VM name"
+        echo "  --ip                    Fuzzy get VM ip"
+        echo "  --snapshot              Fuzzy get snapshot name for VM"
+        ;;
     --all)
         echo -n "$(virsh list --all --name | fzf)"
         ;;
@@ -127,7 +137,19 @@ rollback-snapshot() {
 
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
-    -h | --help) ;;
+    -h | --help)
+        echo "Usage: vmhelper [?OPTION] [COMMAND]"
+        echo "Commands:"
+        echo "  -h, --help                      Display this message"
+        echo "  get [OPTIONS]                   Get vm information"
+        echo "  start                           Start a VM"
+        echo "  attach                          Attach to a VM"
+        echo "  ssh [OPTIONS] [?USERNAME]       SSH into a vm"
+        echo "  ssh-copy [?IP_ADDRESS]          Copy RSA key to vm"
+        echo "  create-snapshot [OPTIONS]       Create a snapshot for a VM"
+        echo "  rollback-snapshot [OPTIONS]     Rollback to VM snapshot"
+        exit 0
+        ;;
     get)
         shift
         get "$@"
