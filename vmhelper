@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 get() {
+    local VM
+    local MAC
+
     case "$1" in
     -h | --help)
         echo "Usage: vmhelper get [?OPTION]"
@@ -49,20 +52,35 @@ get() {
 }
 
 ssh-vm() {
-    case "$1" in
-    esac
+    local USERNAME
+    local IP
 
-    USERNAME=$1
+    while [[ "$#" -gt 0 ]]; do
+        case "$1" in
+        -h | --help)
+            echo "Usage: vmhelper ssh-vm [?OPTION] [?USERNAME]"
+            echo "If no option is selected, default to active VM names"
+            echo "Commands:"
+            echo "  -h, --help              Display this message"
+            echo "  USERNAME                Username to connect with to VM, defaults to root if not provided"
+            exit 0
+            ;;
+        *)
+            USERNAME=$1
+            ;;
+        esac
+        shift
+    done
+
+    if [[ -z $USERNAME ]]; then
+
+        USERNAME='root'
+    fi
 
     IP=$(get --ip)
 
-    if [[ -z $USERNAME ]]; then
-        echo 'username not supplied'
-        exit 0
-    fi
-
     if [[ -n $IP ]]; then
-        ssh "$1@$IP"
+        ssh "$USERNAME@$IP"
     fi
 }
 
@@ -71,7 +89,12 @@ ssh-copy() {
 }
 
 create-snapshot() {
+    local VM
+    local DESCRIPTION
+    local SNAPSHOT_NAME
+
     VM=$(get --active)
+
     while [[ "$#" -gt 0 ]]; do
         case $1 in
         -d | --description)
@@ -99,6 +122,10 @@ create-snapshot() {
 }
 
 rollback-snapshot() {
+    local VM
+    local SNAPSHOT
+    local CHOICE
+
     VM=$1
 
     if [[ -z $VM ]]; then
@@ -143,6 +170,7 @@ while [[ "$#" -gt 0 ]]; do
         echo "  -h, --help                      Display this message"
         echo "  get [OPTIONS]                   Get vm information"
         echo "  start                           Start a VM"
+        echo "  shutdown                        Shutdown a VM"
         echo "  attach                          Attach to a VM"
         echo "  ssh [OPTIONS] [?USERNAME]       SSH into a vm"
         echo "  ssh-copy [?IP_ADDRESS]          Copy RSA key to vm"
@@ -158,6 +186,11 @@ while [[ "$#" -gt 0 ]]; do
     start)
         shift
         virsh start "$(get --inactive)"
+        exit 0
+        ;;
+    shutdown)
+        shift
+        virsh shutdown "$(get --active)"
         exit 0
         ;;
     attach)

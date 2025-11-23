@@ -1,5 +1,6 @@
 # README
 
+## Create a VM from the command line
 
 
 ## List all VMs
@@ -96,3 +97,43 @@ After that:
 ```bash
 ssh user@<vm-ip>
 ```
+
+## Shutdown a VM
+
+```bash
+virsh shutdown <vm-name>
+```
+
+## Undefine the VM including ALL extras
+
+This is the important part. Include flags depending on what the VM has.
+
+Full nuclear undefine:
+
+```bash
+virsh undefine <vmname> --nvram --remove-all-storage --snapshots-metadata
+```
+
+Explanation of flags
+
+--remove-all-storage → deletes all disks tied to the VM that are in storage pools managed by libvirt
+
+--nvram → removes UEFI variables (OVMF, etc.)
+
+--snapshots-metadata → deletes libvirt snapshot metadata
+
+--managed-save → if the VM has a “managed save” state, include this
+
+--keep-snapshots vs --snapshots-metadata → use the snapshots one to delete them
+
+If you want everything absolutely gone, use:
+
+```bash
+virsh undefine <vmname> \
+  --remove-all-storage \
+  --snapshots-metadata \
+  --nvram \
+  --managed-save
+```
+
+
