@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+
+get() {
+    case "$1" in
+    -h | --help) ;;
+    --all)
+        echo -n "$(virsh list --all --name | fzf)"
+        ;;
+    --inactive)
+        # echo -n "$(virsh list --all --inactive --name | fzf)"
+        echo -n "$(virsh list --all --inactive --name | fzf)"
+        ;;
+    --active)
+        # echo -n "$(virsh list --all --inactive --name | fzf)"
+        echo -n "$(virsh list --name | fzf)"
+        ;;
+    --ip)
+        VM="$(virsh list --name | fzf)"
+        if [[ -n $VM ]]; then
+            MAC=$(virsh domiflist "$VM" | awk 'NR>2 {print $5}')
+            echo -n "$(virsh net-dhcp-leases default | awk -v m="$MAC" '$3 == m {print $5}' | cut -d/ -f1)"
+        fi
+        ;;
+    --snapshot)
+        shift
+        VM="$1"
+        if [[ -z "$VM" ]]; then
+            VM="$(get --all)"
+        fi
+
+        if [[ -n $VM ]]; then
+            echo -n "$(virsh snapshot-list --name "$VM" | fzf) "
+        fi
+        ;;
+    *)
+        echo -n "$(virsh list --name | fzf)"
+        ;;
+    esac
+}
+
+ssh-vm() {
+    case "$1" in
+    esac
+
+    USERNAME=$1
+
+    IP=$(get --ip)
+
+    if [[ -z $USERNAME ]]; then
+        echo 'username not supplied'
+        exit 0
+    fi
+
+    if [[ -n $IP ]]; then
+        ssh "$1@$IP"
+    fi
+}
+
+ssh-copy() {
+    ssh-copy-id "$1@$(get --ip)"
+}
+
+create-snapshot() {
+    VM=$(get --active)
+    while [[ "$#" -gt 0 ]]; do
+        case $1 in
+        -d | --description)
+            shift
+            DESCRIPTION="$1"
+            ;;
+        -s | --snapshot-name)
+            shift
+            SNAPSHOT_NAME="$1"
+            ;;
+        esac
+        shift
+    done
+
+    if [[ -z $DESCRIPTION ]]; then
+        read -rp "Enter Description: " DESCRIPTION
+    fi
+
+    if [[ -z $SNAPSHOT_NAME ]]; then
+        read -rp "Enter Snapshot Name: " SNAPSHOT_NAME
+    fi
+
+    virsh snapshot-create-as \
+        --description "$DESCRIPTION" "$VM" "$SNAPSHOT_NAME"
+}
+
+rollback-snapshot() {
+    VM=$1
+
+    if [[ -z $VM ]]; then
+        VM="$(get --active)"
+    fi
+
+    shift
+
+    SNAPSHOT=$1
+
+    if [[ -z $SNAPSHOT ]]; then
+        SNAPSHOT="$(get --snapshot "$VM")"
+    fi
+
+    echo "reverting $VM to $SNAPSHOT"
+
+    CHOICE=''
+
+    while [[ $CHOICE != "y" ]] && [[ $CHOICE != "n" ]]; do
+        read -rp "proceed [y]es/[n]o: " CHOICE
+        CHOICE="${CHOICE:0:1}"
+        CHOICE="${CHOICE,,}"
+        if [[ $CHOICE != "y" ]] && [[ $CHOICE != "n" ]]; then
+            echo "choice should be either [y]es/[n]o"
+        fi
+    done
+
+    if [[ $CHOICE == 'y' ]]; then
+        echo "running: virsh snapshot-revert $VM $SNAPSHOT"
+        virsh snapshot-revert $VM $SNAPSHOT
+    else
+        echo 'revert cancelled'
+    fi
+    exit 0
+}
+
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+    -h | --help) ;;
+    get)
+        shift
+        get "$@"
+        exit 0
+        ;;
+    start)
+        shift
+        virsh start "$(get --inactive)"
+        exit 0
+        ;;
+    attach)
+        shift
+        virsh console "$(get --active)"
+        exit 0
+        ;;
+    ssh)
+        shift
+        ssh-vm "$@"
+        exit 0
+        ;;
+    ssh-copy)
+        shift
+        ssh-copy "$@"
+        exit 0
+        ;;
+    create-snapshot)
+        shift
+        create-snapshot "$@"
+        exit 0
+        ;;
+    rollback-snapshot)
+        shift
+        rollback-snapshot "$@"
+        ;;
+    esac
+    shift
+done
