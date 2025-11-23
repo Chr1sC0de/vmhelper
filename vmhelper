@@ -110,10 +110,16 @@ create-snapshot() {
     local DESCRIPTION
     local SNAPSHOT_NAME
 
-    VM=$(get --active)
-
     while [[ "$#" -gt 0 ]]; do
         case $1 in
+        -h | --help)
+            echo "Usage: vmhelper create-snapshot [?OPTION]"
+            echo "Commands:"
+            echo "  -h, --help              Display this message"
+            echo "  --description           Snapshot Description"
+            echo "  --snapshot-name         Snapshot Name"
+            exit 0
+            ;;
         -d | --description)
             shift
             DESCRIPTION="$1"
@@ -133,6 +139,8 @@ create-snapshot() {
     if [[ -z $SNAPSHOT_NAME ]]; then
         read -rp "Enter Snapshot Name: " SNAPSHOT_NAME
     fi
+
+    VM=$(get --active)
 
     virsh snapshot-create-as \
         --description "$DESCRIPTION" "$VM" "$SNAPSHOT_NAME"
