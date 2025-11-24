@@ -144,8 +144,10 @@ create-snapshot() {
 
     VM=$(get --active)
 
-    virsh snapshot-create-as \
-        --description "$DESCRIPTION" "$VM" "$SNAPSHOT_NAME"
+    if [[ -n $DESCRIPTION ]] && [[ -n $VM ]] && [[ -n $SNAPSHOT_NAME ]]; then
+        virsh snapshot-create-as \
+            --description "$DESCRIPTION" "$VM" "$SNAPSHOT_NAME"
+    fi
 }
 
 rollback-snapshot() {
