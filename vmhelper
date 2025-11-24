@@ -187,7 +187,7 @@ rollback-snapshot() {
 
     echo "reverting $VM to $SNAPSHOT"
 
-    if [[ -z CHOICE ]]; then
+    if [[ -z $CHOICE ]]; then
         CHOICE=''
     fi
 
