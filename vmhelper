@@ -83,6 +83,7 @@ ssh-vm() {
 }
 
 ssh-copy() {
+    local USERNAME
     while [[ "$#" -gt 0 ]]; do
         case "$1" in
         -h | --help)
@@ -92,11 +93,12 @@ ssh-copy() {
             echo "  USERNAME                Username to copy to on VM"
             exit 0
             ;;
+        *)
+            USERNAME=$1
+            ;;
         esac
+        shift
     done
-
-    local USERNAME
-    USERNAME=$1
 
     if [[ -z $USERNAME ]]; then
         echo "no username selected"
