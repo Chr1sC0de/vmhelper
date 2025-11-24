@@ -151,15 +151,35 @@ rollback-snapshot() {
     local SNAPSHOT
     local CHOICE
 
-    VM=$1
+    while [[ "$#" -gt 0 ]]; do
+        case $1 in
+        -h | --help)
+            echo "Usage: vmhelper rollback-snapshot [?OPTION]"
+            echo "Commands:"
+            echo "  -h, --help              Display this message"
+            echo "  -y                      Accept"
+            echo "  --virtual-machine       Virtual machine name"
+            echo "  --snapshot-name         Snapshot Name"
+            exit 0
+            ;;
+        --virtual-machine)
+            shift
+            VM=$1
+            ;;
+        --snapshot-name)
+            shift
+            SNAPSHOT=$1
+            ;;
+        -y)
+            CHOICE='y'
+            ;;
+        esac
+        shift
+    done
 
     if [[ -z $VM ]]; then
         VM="$(get --active)"
     fi
-
-    shift
-
-    SNAPSHOT=$1
 
     if [[ -z $SNAPSHOT ]]; then
         SNAPSHOT="$(get --snapshot "$VM")"
@@ -167,7 +187,9 @@ rollback-snapshot() {
 
     echo "reverting $VM to $SNAPSHOT"
 
-    CHOICE=''
+    if [[ -z CHOICE ]]; then
+        CHOICE=''
+    fi
 
     while [[ $CHOICE != "y" ]] && [[ $CHOICE != "n" ]]; do
         read -rp "proceed [y]es/[n]o: " CHOICE
