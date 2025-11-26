@@ -78,7 +78,7 @@ ssh-vm() {
     IP=$(get --ip)
 
     if [[ -n $IP ]]; then
-        ssh "$USERNAME@$IP"
+        ssh -X "$USERNAME@$IP"
     fi
 }
 
