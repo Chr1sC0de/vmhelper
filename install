@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+DESTINATION=$HOME/.local/bin
+
+FLAGS=(-s -f)
+
+get_file_directory() {
+    FULL_FILEPATH=$(readlink -f "$1")
+    FILE_DIRECTORY=$(dirname "$FULL_FILEPATH")
+    echo "$FILE_DIRECTORY"
+}
+
+main() {
+    while [[ "$#" -gt 0 ]]; do
+        case $1 in
+        -g | --global)
+            # for non distribution-managed programs
+            DESTINATION=/usr/local/bin
+            ;;
+        -v | --verbose)
+            FLAGS+=(-v)
+            ;;
+        undefined) ;;
+        *)
+            echo "invalid option $1"
+            exit 1
+            ;;
+        esac
+        shift
+    done
+    BASE_DIRECTORY=$(get_file_directory "${BASH_SOURCE[0]}")
+    SOURCE="$BASE_DIRECTORY"/vmhelper
+    TARGET="$DESTINATION"/vmhelper
+    ln "${FLAGS[@]}" "$SOURCE" "$TARGET"
+    return 0
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
