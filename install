@@ -2,7 +2,7 @@
 
 DESTINATION=$HOME/.local/bin
 
-FLAGS=(-f)
+FLAGS=()
 
 help() {
     echo "Usage: install [?OPTIONS]"
@@ -42,7 +42,7 @@ main() {
     BASE_DIRECTORY=$(get_file_directory "${BASH_SOURCE[0]}")
     SOURCE="$BASE_DIRECTORY"/vmhelper
     TARGET="$DESTINATION"/vmhelper
-    cp "${FLAGS[@]}" "$SOURCE" "$TARGET"
+    install "${FLAGS[@]}" "$SOURCE" "$TARGET"
     return 0
 }
 
