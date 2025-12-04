@@ -15,6 +15,7 @@ get() {
         echo "  --active                Fuzzy get active VM name"
         echo "  --ip                    Fuzzy get VM ip"
         echo "  --snapshot              Fuzzy get snapshot name for VM"
+        exit 0
         ;;
     --all)
         echo -n "$(virsh list --all --name | fzf)"
