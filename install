@@ -2,7 +2,7 @@
 
 DESTINATION=$HOME/.local/bin
 
-FLAGS=(-s -f)
+FLAGS=(-f)
 
 get_file_directory() {
     FULL_FILEPATH=$(readlink -f "$1")
@@ -31,7 +31,7 @@ main() {
     BASE_DIRECTORY=$(get_file_directory "${BASH_SOURCE[0]}")
     SOURCE="$BASE_DIRECTORY"/vmhelper
     TARGET="$DESTINATION"/vmhelper
-    ln "${FLAGS[@]}" "$SOURCE" "$TARGET"
+    cp "${FLAGS[@]}" "$SOURCE" "$TARGET"
     return 0
 }
 
