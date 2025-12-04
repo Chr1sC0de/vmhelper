@@ -79,7 +79,7 @@ ssh-vm() {
     IP=$(get --ip)
 
     if [[ -n $IP ]]; then
-        XTERM=xterm-256color ssh -X "$USERNAME@$IP"
+        XTERM=xterm-256color ssh -X -t "$USERNAME@$IP" bash '-i'
     fi
 }
 
