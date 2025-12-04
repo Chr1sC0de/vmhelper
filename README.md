@@ -4,16 +4,16 @@
 
 ```bash
 virt-install \
-  --name ubuntu2504 \
-  --ram 8192 \
-  --vcpus 4 \
-  --disk path=/var/lib/libvirt/images/ubuntu2504.img,format=qcow2,size=40 \
-  --location ubuntu-25.04-live-server-amd64.iso,kernel=casper/vmlinuz,initrd=casper/initrd \
-  --os-variant ubuntu25.04 \
-  --network network=default \
-  --graphics none \
-  --console pty,target_type=serial \
-  --extra-args="console=ttyS0,115200n8"
+	--name ubuntu2504 \
+	--ram 8192 \
+	--vcpus 4 \
+	--disk path=/var/lib/libvirt/images/ubuntu2504.img,format=qcow2,size=40 \
+	--location ubuntu-25.04-live-server-amd64.iso,kernel=casper/vmlinuz,initrd=casper/initrd \
+	--os-variant ubuntu25.04 \
+	--network network=default \
+	--graphics none \
+	--console pty,target_type=serial \
+	--extra-args="console=ttyS0,115200n8"
 ```
 
 ## List all VMs
@@ -25,19 +25,19 @@ virsh list --all
 ## Details about VM
 
 ```bash
-virsh dominfo <vmname>
+virsh dominfo $VM_NAME
 ```
 
 ## List all checkpoints for a VM
 
 ```bash
-virsh snapshot-list <vmname>
+virsh snapshot-list $VM_NAME
 ```
 
 ## Actual checkpoints (used with backup features):
 
 ```bash
-virsh checkpoint-list <vmname>
+virsh checkpoint-list $VM_NAME
 ```
 
 ## Revert/restore to a checkpoint
@@ -45,13 +45,13 @@ virsh checkpoint-list <vmname>
 For standard snapshots:
 
 ```bash
-virsh snapshot-revert <vmname> <snapshot_name>
+virsh snapshot-revert $VM_NAME
 ```
 
 For checkpoint-based restore (rare unless you set them up):
 
 ```bash
-virsh restore <vmname> <checkpoint-file>
+virsh restore $VM_NAME
 ```
 
 ## Start the VM in headless mode
@@ -59,19 +59,19 @@ virsh restore <vmname> <checkpoint-file>
 virsh defaults to headless unless you explicitly attach a viewer.
 
 ```bash
-virsh start <vmname> --console
+virsh start $VM_NAME --console
 ```
 
 If you don’t want console output:
 
 ```bash
-virsh start <vmname>
+virsh start $VM_NAME
 ```
 
 If you want to attach to the serial console:
 
 ```bash
-virsh console <vmname>
+virsh console $VM_NAME
 ```
 
 Exit console with:
@@ -101,7 +101,7 @@ sudo apt install openssh-client
 Use it to send your key to a VM
 
 ```bash
-ssh-copy-id user@<vm-ip>
+ssh-copy-id $VM_USER@$VM_IP
 ```
 
 It’ll prompt for the password once, then append your public key to the VM’s ~/.ssh/authorized_keys and set the correct permissions.
@@ -109,13 +109,13 @@ It’ll prompt for the password once, then append your public key to the VM’s 
 After that:
 
 ```bash
-ssh user@<vm-ip>
+ssh $VM_USER@$VM_IP
 ```
 
 ## Shutdown a VM
 
 ```bash
-virsh shutdown <vm-name>
+virsh shutdown $VM_NAME
 ```
 
 ## Undefine the VM including ALL extras
@@ -125,7 +125,7 @@ This is the important part. Include flags depending on what the VM has.
 Full nuclear undefine:
 
 ```bash
-virsh undefine <vmname> --nvram --remove-all-storage --snapshots-metadata
+virsh undefine --remove-all-storage --snapshots-metadata $VM_NAME --nvram
 ```
 
 Explanation of flags
@@ -143,9 +143,9 @@ Explanation of flags
 If you want everything absolutely gone, use:
 
 ```bash
-virsh undefine <vmname> \
-  --remove-all-storage \
-  --snapshots-metadata \
-  --nvram \
-  --managed-save
+virsh undefine \
+	\
+	--snapshots-metadata \
+	--nvram \
+	--managed-save $VM_NAME --remove-all-storage
 ```
