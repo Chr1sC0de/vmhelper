@@ -2,7 +2,6 @@
 
 ## Create a VM from the command line
 
-
 ```bash
 virt-install \
   --name ubuntu2504 \
@@ -16,7 +15,6 @@ virt-install \
   --console pty,target_type=serial \
   --extra-args="console=ttyS0,115200n8"
 ```
-
 
 ## List all VMs
 
@@ -87,6 +85,7 @@ Ctrl + ]
 ```bash
 ls ~/.ssh/id_*.pub
 ```
+
 ## Create key if not exists
 
 ```bash
@@ -150,5 +149,3 @@ virsh undefine <vmname> \
   --nvram \
   --managed-save
 ```
-
-
