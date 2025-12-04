@@ -4,6 +4,16 @@ DESTINATION=$HOME/.local/bin
 
 FLAGS=(-f)
 
+help() {
+    echo "Usage: install [?OPTIONS]"
+    echo "Install vmhelper"
+    echo "Options:"
+    echo "  -h, --help              Display this message"
+    echo "  -g, --global            Fuzzy get all VM names"
+    echo "  -v, --verbose           Fuzzy get inactive VM name"
+    exit 0
+}
+
 get_file_directory() {
     FULL_FILEPATH=$(readlink -f "$1")
     FILE_DIRECTORY=$(dirname "$FULL_FILEPATH")
@@ -13,6 +23,7 @@ get_file_directory() {
 main() {
     while [[ "$#" -gt 0 ]]; do
         case $1 in
+        -h | --help) help ;;
         -g | --global)
             # for non distribution-managed programs
             DESTINATION=/usr/local/bin
