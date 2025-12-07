@@ -1,3 +1,12 @@
 #!/usr/bin/env bash
 
-complete -W "get start shutdown attach ssh ssh-copy create-snapshot rollback-snapshot" vmhelper
+_vmhelper_completions()
+{
+  if [ "${#COMP_WORDS[@]}" != "2" ]; then
+    return
+  fi
+
+  COMPREPLY=($(compgen -W "get start shutdown attach ssh ssh-copy create-snapshot rollback-snapshot" -- "${COMP_WORDS[1]}"))
+}
+
+complete -F _vmhelper_completions vmhelper
