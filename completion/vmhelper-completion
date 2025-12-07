@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+complete -W "get start shutdown attach ssh ssh-copy create-snapshot rollback-snapshot" vmhelper

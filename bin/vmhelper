@@ -214,61 +214,67 @@ rollback-snapshot() {
     exit 0
 }
 
-while [[ "$#" -gt 0 ]]; do
-    case "$1" in
-    -h | --help)
-        echo "Usage: vmhelper [?OPTION] [COMMAND]"
-        echo "Commands:"
-        echo "  -h, --help                      Display this message"
-        echo "  get [OPTIONS]                   Get vm information"
-        echo "  start                           Start a VM"
-        echo "  shutdown                        Shutdown a VM"
-        echo "  attach                          Attach to a VM though the console"
-        echo "  ssh [OPTIONS] [?USERNAME]       SSH into a vm"
-        echo "  ssh-copy [?IP_ADDRESS]          Copy RSA key to vm"
-        echo "  create-snapshot [OPTIONS]       Create a snapshot for a VM"
-        echo "  rollback-snapshot [OPTIONS]     Rollback to VM snapshot"
-        exit 0
-        ;;
-    get)
+main() {
+    while [[ "$#" -gt 0 ]]; do
+        case "$1" in
+        -h | --help)
+            echo "Usage: vmhelper [?OPTION] [COMMAND]"
+            echo "Commands:"
+            echo "  -h, --help                      Display this message"
+            echo "  get [OPTIONS]                   Get vm information"
+            echo "  start                           Start a VM"
+            echo "  shutdown                        Shutdown a VM"
+            echo "  attach                          Attach to a VM though the console"
+            echo "  ssh [OPTIONS] [?USERNAME]       SSH into a vm"
+            echo "  ssh-copy [?IP_ADDRESS]          Copy RSA key to vm"
+            echo "  create-snapshot [OPTIONS]       Create a snapshot for a VM"
+            echo "  rollback-snapshot [OPTIONS]     Rollback to VM snapshot"
+            exit 0
+            ;;
+        get)
+            shift
+            get "$@"
+            exit 0
+            ;;
+        start)
+            shift
+            virsh start "$(get --inactive)"
+            exit 0
+            ;;
+        shutdown)
+            shift
+            virsh shutdown "$(get --active)"
+            exit 0
+            ;;
+        attach)
+            shift
+            virsh console "$(get --active)"
+            exit 0
+            ;;
+        ssh)
+            shift
+            ssh-vm "$@"
+            exit 0
+            ;;
+        ssh-copy)
+            shift
+            ssh-copy "$@"
+            exit 0
+            ;;
+        create-snapshot)
+            shift
+            create-snapshot "$@"
+            exit 0
+            ;;
+        rollback-snapshot)
+            shift
+            rollback-snapshot "$@"
+            ;;
+        esac
         shift
-        get "$@"
-        exit 0
-        ;;
-    start)
-        shift
-        virsh start "$(get --inactive)"
-        exit 0
-        ;;
-    shutdown)
-        shift
-        virsh shutdown "$(get --active)"
-        exit 0
-        ;;
-    attach)
-        shift
-        virsh console "$(get --active)"
-        exit 0
-        ;;
-    ssh)
-        shift
-        ssh-vm "$@"
-        exit 0
-        ;;
-    ssh-copy)
-        shift
-        ssh-copy "$@"
-        exit 0
-        ;;
-    create-snapshot)
-        shift
-        create-snapshot "$@"
-        exit 0
-        ;;
-    rollback-snapshot)
-        shift
-        rollback-snapshot "$@"
-        ;;
-    esac
-    shift
-done
+    done
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    main "$@"
+fi

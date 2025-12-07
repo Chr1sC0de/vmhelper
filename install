@@ -39,10 +39,19 @@ main() {
         esac
         shift
     done
-    BASE_DIRECTORY=$(get_file_directory "${BASH_SOURCE[0]}")
-    SOURCE="$BASE_DIRECTORY"/vmhelper
-    TARGET="$DESTINATION"/vmhelper
-    install "${FLAGS[@]}" "$SOURCE" "$TARGET"
+
+    local base_directory source_ target completions_dir
+
+    base_directory=$(get_file_directory "${BASH_SOURCE[0]}")
+    source_="$base_directory"/bin/vmhelper
+    target="$DESTINATION"/vmhelper
+
+    install "${FLAGS[@]}" "$source_" "$target"
+
+    completions_dir="$HOME"/.bash_completion
+    mkdir -p "$completions_dir"
+    cp ./completion/vmhelper-completion "$completions_dir"
+
     return 0
 }
 
