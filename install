@@ -20,6 +20,14 @@ get_file_directory() {
     echo "$FILE_DIRECTORY"
 }
 
+create_completion_file() {
+    cat >"$HOME"/.bash_completion <<'EOF'
+for bcfile in ~/.bash_completion.d/*; do
+    . "$bcfile"
+done
+EOF
+}
+
 main() {
     while [[ "$#" -gt 0 ]]; do
         case $1 in
@@ -40,7 +48,7 @@ main() {
         shift
     done
 
-    local base_directory source_ target completions_dir
+    local base_directory source_ target completion_file completion_dir
 
     base_directory=$(get_file_directory "${BASH_SOURCE[0]}")
     source_="$base_directory"/bin/vmhelper
@@ -48,9 +56,15 @@ main() {
 
     install "${FLAGS[@]}" "$source_" "$target"
 
-    completions_dir="$HOME"/.bash_completion
-    mkdir -p "$completions_dir"
-    cp ./completion/vmhelper-completion "$completions_dir"
+    completion_file=$HOME/.bash_completion
+    completion_dir=$HOME/.bash_completion.d
+
+    if [[ ! -f $completion_file ]]; then
+        create_completion_file
+    fi
+
+    mkdir -p "$completion_dir"
+    cp ./completion/vmhelper_completion "$completion_dir"
 
     return 0
 }
